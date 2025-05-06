@@ -2,15 +2,20 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"go-simple-rest-api/domain"
+
+	"github.com/doug-martin/goqu"
 )
 
 type customerRepository struct {
-
+	db *goqu.Database
 }
 
-func NewCustomer() domain.CustomerRepository {
-	return &customerRepository{}
+func NewCustomer(con *sql.DB) domain.CustomerRepository {
+	return &customerRepository{
+		db: goqu.New("default", con)
+	}
 }
 // Delete implements domain.CustomerRepository.
 func (cr *customerRepository) Delete(ctx context.Context, id string) error {
