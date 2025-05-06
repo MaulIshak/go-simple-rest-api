@@ -14,7 +14,7 @@ type customerRepository struct {
 
 func NewCustomer(con *sql.DB) domain.CustomerRepository {
 	return &customerRepository{
-		db: goqu.New("default", con)
+		db: goqu.New("default", con),
 	}
 }
 // Delete implements domain.CustomerRepository.

@@ -16,7 +16,7 @@ func main() {
 	app.Get("/developers", developers)
 
 	customerRepository := repository.NewCustomer(dbconnection)
-	_ = app.Listen(cnf.Server.Host + ":"+cnf.Server.Port)
+	_ = app.Listen(cnf.Server.Host + ":" + cnf.Server.Port)
 }
 
 func developers(ctx *fiber.Ctx) error{
