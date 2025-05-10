@@ -12,6 +12,7 @@ require (
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/c2fo/testify v0.0.0-20150827203832-fba96363964a // indirect
+	github.com/doug-martin/goqu/v9 v9.19.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
