@@ -15,14 +15,16 @@ type customerApi struct {
 	customerService domain.CustomerService
 }
 
-func NewCustomer(app *fiber.App, customerService domain.CustomerService){
+func NewCustomer(app *fiber.App, customerService domain.CustomerService, auzMidd fiber.Handler){
 	ca := customerApi{
 		customerService: customerService,
 	}
 
-	app.Get("/customers", ca.Index)
-	app.Post("/customers", ca.Create)
-	app.Put("/customers/:id", ca.Update)
+	app.Get("/customers",auzMidd, ca.Index)
+	app.Post("/customers",auzMidd, ca.Create)
+	app.Put("/customers/:id",auzMidd, ca.Update)
+	app.Delete("/customers/:id",auzMidd, ca.Delete)
+	app.Get("/customers/:id",auzMidd, ca.Show)
 }
 
 func (ca customerApi) Index(ctx *fiber.Ctx) error{
@@ -80,4 +82,31 @@ func (ca customerApi) Update(ctx *fiber.Ctx) error{
 
 	}
 	return ctx.Status(http.StatusOK).JSON(dto.CreateResponseSuccess(""))
+}
+
+func (ca customerApi) Delete(ctx *fiber.Ctx) error{
+	c, cancel := context.WithTimeout(ctx.Context(), 10*time.Second)
+	defer cancel()
+
+	id := ctx.Params("id")
+	err := ca.customerService.Delete(c, id)
+	if err != nil{
+		return ctx.Status(http.StatusInternalServerError).JSON(dto.CreateResponseError(err.Error()))
+
+	}
+
+	return ctx.SendStatus(http.StatusNoContent)
+}
+
+func (ca customerApi) Show(ctx *fiber.Ctx) error{
+	c, cancel := context.WithTimeout(ctx.Context(), 10*time.Second)
+	defer cancel()
+
+	id := ctx.Params("id")
+	data, err := ca.customerService.Show(c, id)
+	if err != nil{
+		return ctx.Status(http.StatusInternalServerError).JSON(dto.CreateResponseError(err.Error()))
+	}
+
+	return ctx.Status(http.StatusOK).JSON(dto.CreateResponseSuccess(data))
 }

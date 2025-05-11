@@ -30,7 +30,7 @@ func (c customerService) Index(ctx context.Context) ([]dto.CustomerData, error) 
 	if err != nil {
 		return nil, err
 	}
-
+	
 	var customersData []dto.CustomerData
 	
 	for _, val := range customers {
@@ -53,19 +53,51 @@ func (c *customerService) Create(ctx context.Context, req dto.CreateCustomerRequ
 	
 	return c.customerRepository.Save(ctx, &customer)
 }
+
 // Update implements domain.CustomerService.
 func (c *customerService) Update(ctx context.Context, req dto.UpdateCustomerRequest) error {
 	persisted, err := c.customerRepository.FindById(ctx, req.ID)
-	if err != nil{
+	if err != nil {
 		return err
 	}
-	if persisted.ID == ""{
+	if persisted.ID == "" {
 		return errors.New("data customer tidak ditemukan")
-
+		
 	}
 	persisted.Code = req.Code
 	persisted.Name = req.Name
-	persisted.UpdatedAt = sql.NullTime{Valid:true, Time: time.Now()}
-
+	persisted.UpdatedAt = sql.NullTime{Valid: true, Time: time.Now()}
+	
 	return c.customerRepository.Update(ctx, &persisted)
+}
+
+// Delete implements domain.CustomerService.
+func (c *customerService) Delete(ctx context.Context, id string) error {
+	exist, err := c.customerRepository.FindById(ctx, id)
+	if err != nil {
+		return err
+	}
+	
+	if exist.ID == "" {
+		return errors.New("data customer tidak ditemukan")
+	}
+	return c.customerRepository.Delete(ctx, id)
+}
+
+// Show implements domain.CustomerService.
+func (c *customerService) Show(ctx context.Context, id string) (dto.CustomerData, error) {
+	exist, err := c.customerRepository.FindById(ctx, id)
+	if err != nil {
+		return dto.CustomerData{}, err
+	}
+
+	if exist.ID == ""{
+		return dto.CustomerData{}, errors.New("data customer tidak ditemukan")
+	}
+
+	return dto.CustomerData{
+		ID: exist.ID,
+		Code: exist.Code,
+		Name: exist.Name,
+	}, nil
 }
